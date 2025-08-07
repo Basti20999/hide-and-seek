@@ -32,7 +32,7 @@ public class HideAndSeek extends JavaPlugin implements Listener {
     private boolean gameStarted = false;
     private boolean hidingPhase = false;
     private long hidingTimeEnd;
-    private static final long HIDING_TIME_SECONDS = 600; // 10 minutes
+    private static final long HIDING_TIME_SECONDS = 60; // 10 minutes
 
     @Override
     public void onEnable() {
@@ -43,6 +43,7 @@ public class HideAndSeek extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getCommand("setspawn").setExecutor(new SetSpawnCommand());
         getCommand("setseeker").setExecutor(new SetSeekerCommand());
+        getCommand("removeseeker").setExecutor(new RemoveSeekerCommand());
         getCommand("start").setExecutor(new StartCommand());
         getCommand("glowing").setExecutor(new GlowingCommand());
 
@@ -159,6 +160,40 @@ public class HideAndSeek extends JavaPlugin implements Listener {
         }
     }
 
+    private class RemoveSeekerCommand implements CommandExecutor {
+        @Override
+        public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+            if (args.length == 0) {
+                sender.sendMessage(ChatColor.RED + "Bitte gib mindestens einen Spielernamen an!");
+                return true;
+            }
+
+            for (String playerName : args) {
+                Player player = Bukkit.getPlayer(playerName);
+                if (player != null) {
+                    if (seekers.contains(player)) {
+                        seekers.remove(player);
+                        // Show seeker's nametag
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab nametag showview " + player.getName());
+                        player.sendMessage(ChatColor.GREEN + "Du bist kein Seeker mehr!");
+                        // If game is running, make them a hider
+                        if (gameStarted && !hiders.contains(player)) {
+                            hiders.add(player);
+                            player.setGameMode(GameMode.SURVIVAL);
+                            player.teleport(spawnPoint);
+                            player.sendMessage(ChatColor.GREEN + "Du bist jetzt ein Hider!");
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.YELLOW + playerName + " ist kein Seeker!");
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Spieler " + playerName + " nicht gefunden!");
+                }
+            }
+            return true;
+        }
+    }
+
     private class StartCommand implements CommandExecutor {
         @Override
         public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -237,14 +272,17 @@ public class HideAndSeek extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (spawnPoint != null) {
-            player.setGameMode(GameMode.SURVIVAL);
-            player.teleport(spawnPoint);
+            if (gameStarted) {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.teleport(spawnPoint);
+                player.sendMessage(ChatColor.BLUE + "Das Spiel läuft bereits! Du bist im Zuschauermodus.");
+            } else {
+                player.setGameMode(GameMode.SURVIVAL);
+                player.teleport(spawnPoint);
+            }
         }
-        // Add joining players as hiders if game is running
-        if (gameStarted && !seekers.contains(player)) {
-            hiders.add(player);
-            player.sendMessage(ChatColor.GREEN + "Du bist ein Hider!");
-        } else if (gameStarted && seekers.contains(player)) {
+        // Handle seekers' nametags if they rejoin
+        if (gameStarted && seekers.contains(player)) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab nametag hideview " + player.getName());
             player.sendMessage(ChatColor.YELLOW + "Du bist ein Seeker!");
         }

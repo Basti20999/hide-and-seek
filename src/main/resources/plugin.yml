@@ -10,6 +10,9 @@ commands:
   setseeker:
     description: Legt Spieler als Seeker fest
     usage: /<command> <player> [player...]
+  removeseeker:
+    description: Entfernt Spieler aus der Seeker-Rolle
+    usage: /<command> <player> [player...]
   start:
     description: Startet das Hide and Seek Spiel
     usage: /<command>
