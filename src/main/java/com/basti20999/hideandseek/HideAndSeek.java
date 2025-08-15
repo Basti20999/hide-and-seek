@@ -32,7 +32,7 @@ public class HideAndSeek extends JavaPlugin implements Listener {
     private boolean gameStarted = false;
     private boolean hidingPhase = false;
     private long hidingTimeEnd;
-    private static final long HIDING_TIME_SECONDS = 60; // 10 minutes
+    private static final long HIDING_TIME_SECONDS = 600; // 10 minutes
 
     @Override
     public void onEnable() {
