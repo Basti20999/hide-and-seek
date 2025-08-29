@@ -1,0 +1,21 @@
+name: HideAndSeek
+version: 1.0
+main: com.basti20999.hideandseek.HideAndSeek
+api-version: 1.21
+softdepend: [PlaceholderAPI]
+commands:
+  setspawn:
+    description: Setzt den Spawnpunkt für das Spiel
+    usage: /<command>
+  setseeker:
+    description: Legt Spieler als Seeker fest
+    usage: /<command> <player> [player...]
+  removeseeker:
+    description: Entfernt Spieler aus der Seeker-Rolle
+    usage: /<command> <player> [player...]
+  start:
+    description: Startet das Hide and Seek Spiel
+    usage: /<command>
+  glowing:
+    description: Schaltet das Leuchten der Hider um
+    usage: /<command>
