@@ -1,9 +1,0 @@
-# Configuration file for HideAndSeek plugin
-# This file stores the spawn point coordinates for the game
-spawn-point:
-  x: 0.0
-  y: 0.0
-  z: 0.0
-  yaw: 0.0
-  pitch: 0.0
-  world: world
